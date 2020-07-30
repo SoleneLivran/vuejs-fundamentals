@@ -6,22 +6,46 @@
         <link rel="stylesheet" href="main.css">
     </head>
     <body>
+
         <div id="shopping-list">
+
             <div class="header">
                 <h1>{{ header.toLocaleUpperCase() }}</h1>
+                <!-- page on its default state = you see the button to add an item -->
+                <!-- on click on the button, the page changes state to its edit state -->
                 <button v-if="state === 'default'" class="btn btn-primary" @click="changeState('edit')">Add Item</button>
-                <button v-else class="btn btn-cancel" @click="changeState('default')">Cancel Adding Item</button>
+                <!-- then when the page is on its edit state = you can see the button to cancel -->
+                <!-- on click on the cancel button, the pages changes back to its default state -->
+                <button v-if="state === 'edit'" class="btn btn-cancel" @click="changeState('default')">Cancel</button>
+                <!-- v-if = togles between the 2 buttons depending on page's state -->
             </div>
+
+            <!-- this div exists in the DOM only if the page is on its edit state-->
+            <!-- in this case we have the input field and save item button -->
             <div v-if="state === 'edit'" class="add-item-form">
+                <!-- when filling the input field, it changes the newItem data, which is an empty string by default -->
                 <input v-model="newItem" type="text" placeholder="Add an item" @keyup.enter="saveItem">
-                <button class="btn btn-primary" :disabled="newItem.length === 0" @click="saveItem">Save Item</button>
+                <p>{{ characterCount }}/50</p>
+                <!-- with ":disabled" = if no input in the newItem field, the save item button is disabled (: = v-bind) -->
+                <button class="btn btn-primary" :disabled="isDisabled" @click="saveItem">Save Item</button>
             </div>
+            <!-- </div> -->
+            
             <ul>
                 <li v-for="item in reversedItems" :class="{strikeout: item.purchased}" @click="togglePurchased(item)">{{ item.label }}</li>
+                <!-- = class dynamique -->
+                <!-- pour mettre aussi une classe statique, on le fait avec la syntaxe classique en + -->
+
+                <!-- Toggle de class aussi possible avec une syntaxe en array -->
+                <!-- un peu plus lourd mais un peu plus flexible -->
+                <!-- par exemple, permet de suivre plusieurs conditions : ici le statut purchased mais aussi le status highPriority -->
+                <!-- :class="[item.purchased ? 'strikeout' : '', item.highPriority ? 'priority' : '']" -->
             </ul>
             <p v-if="items.length === 0">Nice job! You've bought all your items.</p>
         </div>
+
         <script src="https://unpkg.com/vue"></script>
+
         <script>
             var shoppingList = new Vue({
                 el: '#shopping-list',
@@ -48,7 +72,18 @@
                     ]
                 },
                 computed: {
+                    characterCount() {
+                        return this.newItem.length;
+                    },
+                    isDisabled() {
+                        if (this.newItem.length === 0 || this.newItem.length > 50) {
+                            return true
+                        } else {
+                            return false
+                        }
+                    },
                     reversedItems() {
+                        // slice = copy of the array, so we don't change our datas
                         return this.items.slice(0).reverse();
                     }
                 },
@@ -70,5 +105,6 @@
                 }
             })
         </script>
+        
     </body>
 </html>
